@@ -13,6 +13,7 @@ class Main extends Phaser.State {
 	create() {
 		game = this.game;
 		sprites = new Sprites(game);
+		console.log('Main state');
 
 		//Enable Arcade Physics
 		game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -33,6 +34,11 @@ class Main extends Phaser.State {
 
 		cursors = game.input.keyboard.createCursorKeys();
 
+		// can't figure out where to put this to make it "global"
+		// i.e not only listenable when this state is active
+		let mkey = this.game.input.keyboard.addKey(Phaser.KeyCode.M);
+		mkey.onDown.add(this.switchState, this);
+
 	}
 
 	update() {
@@ -40,6 +46,9 @@ class Main extends Phaser.State {
 		move(duck, cursors);
 	}
 
+	switchState() {
+		this.game.state.start('ProceduralTest');
+	}
 }
 
 export default Main;
