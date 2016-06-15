@@ -1,9 +1,9 @@
 import ExampleObject from 'objects/ExampleObject';
 
-class Main extends Phaser.State {
+class ProceduralTest extends Phaser.State {
 
 	create() {
-		console.log('Main state');
+		console.log('ProceduralTest state');
 
 		//Enable Arcade Physics
 		this.game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -14,8 +14,6 @@ class Main extends Phaser.State {
 		//Example of including an object
 		//let exampleObject = new ExampleObject(this.game);
 
-		// can't figure out where to put this to make it "global"
-		// i.e not only listenable when this state is active
 		let mkey = this.game.input.keyboard.addKey(Phaser.KeyCode.M);
 		mkey.onDown.add(this.switchState, this);
 	}
@@ -25,8 +23,8 @@ class Main extends Phaser.State {
 	}
 
 	switchState() {
-		this.game.state.start('ProceduralTest');
+		this.game.state.start('Main');
 	}
 }
 
-export default Main;
+export default ProceduralTest;
