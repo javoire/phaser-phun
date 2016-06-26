@@ -1,0 +1,21 @@
+{
+  "name": "phaser-phun",
+  "description": "Tiny flexible template for writing Phaser games in ES6/ES2015 with Babel.",
+  "main": "src/index.js",
+  "authors": [
+    "Jonatan Dahl",
+    "Emma Sjostrom"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/javoire/phaser-phun",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "Processing.js": "^1.4.16"
+  }
+}

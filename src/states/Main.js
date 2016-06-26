@@ -1,5 +1,7 @@
 import Sprites from 'objects/Sprites';
 import move from 'modules/move';
+import draw from 'modules/testBackground';
+
 
 var duck;
 var game;
@@ -7,6 +9,7 @@ var platforms;
 var cursors;
 var sprites;
 var ground;
+var spacebar;
 
 class Main extends Phaser.State {
 
@@ -22,17 +25,27 @@ class Main extends Phaser.State {
 
 		platforms = game.add.group();
 		platforms.enableBody = true;
-		ground = platforms.create(0, game.world.height - 80);
-		ground.body.immovable = true;
+		// ground = sprites.ground(platforms);
+
+		spacebar = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR)
 
 		duck = sprites.duck();
 		game.physics.arcade.enable(duck);
+		duck.enableBody = true;
 
 		duck.body.bounce.y = 0.2;
 		duck.body.gravity.y = 300;
 		duck.body.collideWorldBounds = true;
 
 		cursors = game.input.keyboard.createCursorKeys();
+		draw(game, platforms);
+
+
+		// var structure = this.game.create.texture(key, sprite, this.pixelWidth, this.pixelHeight);
+		// var ground = group.create(0, this.game.world.height - 100, structure);
+		// ground.body.immovable = true;
+		// ground.scale.setTo(2, 2);
+
 
 		// can't figure out where to put this to make it "global"
 		// i.e not only listenable when this state is active
@@ -43,7 +56,9 @@ class Main extends Phaser.State {
 
 	update() {
 		game.physics.arcade.collide(duck, platforms);
-		move(duck, cursors);
+		move(duck, cursors, spacebar);
+		// draw(game, platforms);
+
 	}
 
 	switchState() {

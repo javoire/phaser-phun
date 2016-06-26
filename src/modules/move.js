@@ -1,4 +1,4 @@
-export default function move(player, cursors) {
+export default function move(player, cursors, spacebar) {
 
   player.body.velocity.x = 0;
 
@@ -16,10 +16,9 @@ export default function move(player, cursors) {
     player.body.velocity.x = 150;
   }
 
-  if (cursors.up.isDown && player.body.touching.down)
+  if (spacebar.isDown && player.body.touching.down)
   {
     player.body.velocity.y = -350;
   }
-
 
 }
