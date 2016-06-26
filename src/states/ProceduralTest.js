@@ -41,39 +41,35 @@ class ProceduralTest extends Phaser.State {
     // GENERATE MAP DATA
     // go throught the entire viewport, increment by tilesize
     let mapData = '';
-    for (let screenX = 0; screenX < this.game.camera.width; screenX += tileSize) {
+    for (let screenY = 0; screenY < this.game.camera.height; screenY += tileSize) {
 
-      // get Y value for this screen X coordinate
-      let yNoise = p.noise(screenX * scale, 1, 1) * 700;
+      for (let screenX = 0; screenX < this.game.camera.width; screenX += tileSize) {
 
-      for (let screenY = 0; screenY < this.game.camera.height; screenY += tileSize) {
+        // get Y value for this screen X coordinate
+        let yNoise = p.noise(screenX * scale, 1, 1) * 700;
 
         // render a sprite tile if current screen Y coordinate is lower
         // than the y noise value (screen coords Y is inverted, hence the >)
         if (screenY > yNoise) {
           mapData += '0'; // pick the "first" tile (we'll only have one tile...)
-
-          // let data = ['3333','3553','3553','3333'];
-          // let id = 'tile'+screenX+screenY;
-          // this.game.create.texture(id, data, pixelWidth, pixelHeight);
-          // this.game.add.sprite(screenX, screenY, id);
         } else {
-          mapData += '.';
+          mapData += '.'; // transparent tile
         }
 
         // add comma except after last item
-        if (screenY < this.game.camera.height - tileSize) {
+        if (screenX < this.game.camera.width - tileSize) {
           mapData += ',';
         }
+
+        // print debug line
+        graphics.lineTo(screenX, yNoise)
       }
 
       // add new line except after last line
-      if (screenX < this.game.camera.width - tileSize) {
+      if (screenY < this.game.camera.height - tileSize) {
         mapData += '\n';
       }
 
-      // print debug line
-      graphics.lineTo(screenX, yNoise)
     }
 
     console.log(mapData)
@@ -91,7 +87,7 @@ class ProceduralTest extends Phaser.State {
     map.addTilesetImage('tile', 'tile', tileSize, tileSize);
     let bgLayer = map.createLayer(0);
 
-    bgLayer.resizeWorld();
+    // bgLayer.resizeWorld();
 
   }
 
