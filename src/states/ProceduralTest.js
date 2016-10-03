@@ -23,6 +23,7 @@ class ProceduralTest extends Phaser.State {
 
   update() {
     if (this.updatingTerrain) {
+      console.log('asdsa');
       this.drawTerrain()
     }
   }
@@ -61,8 +62,7 @@ class ProceduralTest extends Phaser.State {
 
     // redraw terrain when editing values
     document.querySelector('.dg.main.a').addEventListener('mousedown', () => this.updatingTerrain = true);
-    document.querySelector('.dg.main.a').addEventListener('mouseup', () => this.updatingTerrain = false);
-    document.querySelector('.dg.main.a').addEventListener('mouseleave', () => this.updatingTerrain = false);
+    document.addEventListener('mouseup', () => this.updatingTerrain = false);
   }
 }
 
