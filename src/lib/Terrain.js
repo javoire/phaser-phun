@@ -1,11 +1,23 @@
 class Terrain {
 
-  constructor(game) {
+  constructor(game, settings) {
     this.game = game;
     this.p = new Processing();
+    this._settings = settings;
   }
 
-  draw({tileSize, scale, noiseSeed, noiseDetail_1, noiseDetail_2, centerFalloff}) {
+  get settings() {
+    return this._settings;
+  }
+
+  set settings(newSettings) {
+    if (newSettings) {
+      this._settings = newSettings;
+    }
+  }
+
+  draw() {
+    const { tileSize, scale, noiseSeed, noiseDetail_1, noiseDetail_2, centerFalloff } = this._settings;
     const screenCenterY = this.game.camera.height / 2;
 
     this.p.noiseSeed(noiseSeed);
@@ -51,16 +63,11 @@ class Terrain {
 
     }
 
-    // console.log(mapData);
-    console.log('asdsa');
-
     // ref: http://phaser.io/examples/v2/category/tilemaps
 
     // Add data to the cache
     this.game.cache.addTilemap('bgTiles', null, mapData, Phaser.Tilemap.CSV);
     const map = this.game.add.tilemap('bgTiles', tileSize, tileSize);
-    // const tileWidth = Math.floor(this.game.camera.width / tileSize);
-    // const tileHeight = Math.floor(this.game.camera.width / tileSize);
 
     //  'tiles' = cache image key,
     this.game.create.texture('tile', ['5'], tileSize, tileSize);
