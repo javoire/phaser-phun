@@ -1,6 +1,6 @@
-import Sprites from 'objects/Sprites';
-import move from 'modules/move';
-import draw from 'modules/testBackground';
+import Sprites from '../objects/Sprites';
+import move from '../modules/move';
+import draw from '../modules/testBackground';
 
 
 var duck;

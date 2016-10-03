@@ -75,7 +75,7 @@ function copyStatic() {
 function copyPhaser() {
 
     var srcList = ['phaser.min.js'];
-    
+
     if (!isProduction()) {
         srcList.push('phaser.map', 'phaser.js');
     }
@@ -108,7 +108,7 @@ function build() {
         entries: ENTRY_FILE,
         debug: true
     })
-    .transform(babelify)
+    .transform(babelify, { presets: ['es2015'] })
     .bundle().on('error', function(error){
           gutil.log(gutil.colors.red('[Build Error]', error.message));
           this.emit('end');

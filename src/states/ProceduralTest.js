@@ -1,93 +1,97 @@
-import ExampleObject from 'objects/ExampleObject';
+import Dat from 'dat.gui';
 
 class ProceduralTest extends Phaser.State {
 
   create() {
+    const _this = this;
+
     console.log('ProceduralTest state');
-
-    //Enable Arcade Physics
-    // this.game.physics.startSystem(Phaser.Physics.ARCADE);
-
-    //Set the games background colour
     this.game.stage.backgroundColor = '#eeeeff';
 
-    //Example of including an object
-    //let exampleObject = new ExampleObject(this.game);
-
     // switch state
-    let mkey = this.game.input.keyboard.addKey(Phaser.KeyCode.M);
+    const mkey = this.game.input.keyboard.addKey(Phaser.KeyCode.M);
     mkey.onDown.add(this.switchState, this);
 
-    // graphics test
-    let graphics = this.game.add.graphics(100, 100);
+    const graphics = this.game.add.graphics(100, 100);
+    const p = new Processing();
+    const screenCenterY = this.game.camera.height / 2;
 
-    let p = new Processing();
+    const Terrain = function() {
+      const pixelWidth = 16;
+      this.pixelHeight = pixelWidth;
+      this.tileSize = pixelWidth;
+      this.scale = 0.0001;
+      this.noiseSeed = 1;
+      this.noiseDetail_1 = 8;
+      this.noiseDetail_2 = 0.7;
 
-    let pixelWidth = 32;
-    let pixelHeight = pixelWidth;
+      p.noiseSeed(this.noiseSeed);
+      p.noiseDetail(this.noiseDetail_1, this.noiseDetail_2);
 
-    // a tile should be 32 pixels in size (4 sprite pixels..)
-    // add spacing of 1 to easier see individual tiles
-    let tileSize = pixelWidth;
+      // for debug line
+      graphics.moveTo(0, 0);
+      graphics.lineStyle(1, 0x0000FF, 0.8);
 
-    let scale = 0.0001;
-    p.noiseSeed(1);
-    p.noiseDetail(8, 0.7);
+      // GENERATE MAP DATA
+      // go throught the entire viewport, increment by tilesize
+      let mapData = '';
+      for (let screenY = 0; screenY < _this.game.camera.height; screenY += this.tileSize) {
+        for (let screenX = 0; screenX < _this.game.camera.width; screenX += this.tileSize) {
 
-    // for debug line
-    graphics.moveTo(0, 0);
-    graphics.lineStyle(1, 0x0000FF, 0.8);
+          // get noise value for this X and Y coordinate
+          let noise = p.noise(screenX * this.scale, screenY * this.scale, 1);
 
-    // GENERATE MAP DATA
-    // go throught the entire viewport, increment by tilesize
-    let mapData = '';
-    for (let screenY = 0; screenY < this.game.camera.height; screenY += tileSize) {
+          // above center should be more likely to be transparent
+          // and below more likely to be a tile
+          noise *= ((screenCenterY-screenY)/screenCenterY*0.8)+1;
 
-      for (let screenX = 0; screenX < this.game.camera.width; screenX += tileSize) {
+          if (noise < 1) {
+            mapData += '0'; // show the "first" tile (we'll only have one tile...)
+          } else {
+            mapData += '.'; // transparent tile
+          }
 
-        // get Y value for this screen X coordinate
-        let yNoise = p.noise(screenX * scale, 1, 1) * 700;
+          // add comma except after last item
+          if (screenX < _this.game.camera.width - this.tileSize) {
+            mapData += ',';
+          }
 
-        // render a sprite tile if current screen Y coordinate is lower
-        // than the y noise value (screen coords Y is inverted, hence the >)
-        if (screenY > yNoise) {
-          mapData += '0'; // pick the "first" tile (we'll only have one tile...)
-        } else {
-          mapData += '.'; // transparent tile
+          // print debug line
+          // graphics.lineTo(screenX, noise)
         }
 
-        // add comma except after last item
-        if (screenX < this.game.camera.width - tileSize) {
-          mapData += ',';
+        // add new line except after last line
+        if (screenY < _this.game.camera.height - this.tileSize) {
+          mapData += '\n';
         }
 
-        // print debug line
-        graphics.lineTo(screenX, yNoise)
       }
 
-      // add new line except after last line
-      if (screenY < this.game.camera.height - tileSize) {
-        mapData += '\n';
-      }
+      console.log(mapData);
 
-    }
+      // ref: http://phaser.io/examples/v2/category/tilemaps
 
-    console.log(mapData)
+      // Add data to the cache
+      _this.game.cache.addTilemap('bgTiles', null, mapData, Phaser.Tilemap.CSV);
+      const map = _this.game.add.tilemap('bgTiles', this.tileSize, this.tileSize);
+      // const tileWidth = Math.floor(_this.game.camera.width / this.tileSize);
+      // const tileHeight = Math.floor(_this.game.camera.width / this.tileSize);
 
-    // ref: http://phaser.io/examples/v2/category/tilemaps
+      //  'tiles' = cache image key,
+      _this.game.create.texture('tile', ['5'], this.tileSize, this.tileSize);
+      map.addTilesetImage('tile', 'tile', this.tileSize, this.tileSize);
+      const bgLayer = map.createLayer(0);
 
-    // Add data to the cache
-    this.game.cache.addTilemap('bgTiles', null, mapData, Phaser.Tilemap.CSV);
-    let map = this.game.add.tilemap('bgTiles', tileSize, tileSize);
-    // let tileWidth = Math.floor(this.game.camera.width / tileSize);
-    // let tileHeight = Math.floor(this.game.camera.width / tileSize);
+      // bgLayer.resizeWorld();
+    };
 
-    //  'tiles' = cache image key,
-    this.game.create.texture('tile', ['5'], tileSize, tileSize);
-    map.addTilesetImage('tile', 'tile', tileSize, tileSize);
-    let bgLayer = map.createLayer(0);
-
-    // bgLayer.resizeWorld();
+    const terrain = new Terrain();
+    const gui = new Dat.GUI();
+    gui.add(terrain, 'tileSize');
+    gui.add(terrain, 'scale');
+    gui.add(terrain, 'noiseSeed');
+    gui.add(terrain, 'noiseDetail_1');
+    gui.add(terrain, 'noiseDetail_2');
 
   }
 
