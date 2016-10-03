@@ -6,6 +6,7 @@ class ProceduralTest extends Phaser.State {
   constructor() {
     super();
     this.drawTerrain = this.drawTerrain.bind(this);
+    this.setupTerrain = this.setupTerrain.bind(this);
   }
 
   create() {
@@ -16,6 +17,26 @@ class ProceduralTest extends Phaser.State {
     mkey.onDown.add(this.switchState, this);
 
     this.game.stage.backgroundColor = '#eeeeff';
+    this.setupTerrain();
+  }
+
+  update() {
+
+  }
+
+  switchState() {
+    this.game.state.start('Main');
+  }
+
+  drawTerrain() {
+    if (!this.terrain) {
+      console.error('Terran hasn\'t been instantiated. Got: ' + this.terrain)
+    }
+    this.terrain.settings = this.terrainSettings;
+    this.terrain.draw();
+  }
+
+  setupTerrain() {
     this.terrainSettings = {
       tileSize: 16,
       scale: 0.0001,
@@ -38,22 +59,6 @@ class ProceduralTest extends Phaser.State {
 
     controllers.map((c) => c.onFinishChange(this.drawTerrain));
     this.drawTerrain()
-  }
-
-  drawTerrain() {
-    if (!this.terrain) {
-      console.error('Terran hasn\'t been instantiated. Got: ' + this.terrain)
-    }
-    this.terrain.settings = this.terrainSettings;
-    this.terrain.draw();
-  }
-
-  update() {
-
-  }
-
-  switchState() {
-    this.game.state.start('Main');
   }
 }
 
