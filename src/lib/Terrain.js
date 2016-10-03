@@ -4,6 +4,9 @@ class Terrain {
     this.game = game;
     this.p = new Processing();
     this._settings = settings;
+
+    const mapData = this.generateMapData();
+    this.renderTileMap(mapData);
   }
 
   get settings() {
@@ -16,20 +19,40 @@ class Terrain {
     }
   }
 
-  draw() {
+  redraw() {
+    const mapData = this.generateMapData();
+
+    // remove previous TilemapLayer
+    // IMPORTANT! prevent memory leak
+    this.tilemapLayer.destroy();
+
+    this.renderTileMap(mapData);
+  }
+
+  renderTileMap(mapData) {
+    // add tiles from mapData to cache
+    this.game.cache.addTilemap('bgTiles', null, mapData, Phaser.Tilemap.CSV);
+
+    // create a tilemap instance
+    this.tilemap = this.game.add.tilemap('bgTiles', this._settings.tileSize, this._settings.tileSize);
+
+    // create a texture for a tile
+    this.game.create.texture('tile', ['5'], this._settings.tileSize, this._settings.tileSize);
+
+    // add tile texture to tilemap
+    this.tilemap.addTilesetImage('tile', 'tile', this._settings.tileSize, this._settings.tileSize);
+
+    // create a TilemapLayer
+    this.tilemapLayer = this.tilemap.createLayer(0);
+  }
+
+  generateMapData() {
     const { tileSize, scale, noiseSeed, noiseDetail_1, noiseDetail_2, centerFalloff } = this._settings;
     const screenCenterY = this.game.camera.height / 2;
 
     this.p.noiseSeed(noiseSeed);
     this.p.noiseDetail(noiseDetail_1, noiseDetail_2);
 
-    // for debug line
-    const graphics = this.game.add.graphics(100, 100);
-    graphics.moveTo(0, 0);
-    graphics.lineStyle(1, 0x0000FF, 0.8);
-
-    // GENERATE MAP DATA
-    // go through the entire viewport, increment by tilesize
     let mapData = '';
     for (let screenY = 0; screenY < this.game.camera.height; screenY += tileSize) {
       for (let screenX = 0; screenX < this.game.camera.width; screenX += tileSize) {
@@ -39,7 +62,7 @@ class Terrain {
 
         // above center should be more likely to be transparent
         // and below more likely to be a tile
-        noise *= ((screenCenterY-screenY)/screenCenterY*centerFalloff)+1;
+        noise *= ((screenCenterY - screenY) / screenCenterY * centerFalloff) + 1;
 
         if (noise < 1) {
           mapData += '0'; // show the "first" tile (we'll only have one tile...)
@@ -62,18 +85,7 @@ class Terrain {
       }
 
     }
-
-    // ref: http://phaser.io/examples/v2/category/tilemaps
-
-    // Add data to the cache
-    this.game.cache.addTilemap('bgTiles', null, mapData, Phaser.Tilemap.CSV);
-    const map = this.game.add.tilemap('bgTiles', tileSize, tileSize);
-
-    //  'tiles' = cache image key,
-    this.game.create.texture('tile', ['5'], tileSize, tileSize);
-    map.addTilesetImage('tile', 'tile', tileSize, tileSize);
-    const bgLayer = map.createLayer(0);
-    // bgLayer.resizeWorld();
+    return mapData;
   }
 }
 

@@ -7,6 +7,7 @@ class ProceduralTest extends Phaser.State {
     super();
     this.drawTerrain = this.drawTerrain.bind(this);
     this.setupTerrain = this.setupTerrain.bind(this);
+    this.updatingTerrain = false;
   }
 
   create() {
@@ -21,7 +22,9 @@ class ProceduralTest extends Phaser.State {
   }
 
   update() {
-
+    if (this.updatingTerrain) {
+      this.drawTerrain()
+    }
   }
 
   switchState() {
@@ -29,11 +32,8 @@ class ProceduralTest extends Phaser.State {
   }
 
   drawTerrain() {
-    if (!this.terrain) {
-      console.error('Terran hasn\'t been instantiated. Got: ' + this.terrain)
-    }
     this.terrain.settings = this.terrainSettings;
-    this.terrain.draw();
+    this.terrain.redraw();
   }
 
   setupTerrain() {
@@ -45,20 +45,24 @@ class ProceduralTest extends Phaser.State {
       noiseDetail_2: 0.7,
       centerFalloff: 0.8
     };
+
+    // instaniate and render a noise terrain
     this.terrain = new Terrain(this.game, this.terrainSettings);
 
+    // add gui controls to tweak the terrain settings in real time
     const gui = new Dat.GUI();
-    const controllers = [
-      gui.add(this.terrainSettings, 'tileSize'), //.min(4).max(64).step(1),
-      gui.add(this.terrainSettings, 'scale'), //.min(0.00001).max(0.001).step(0.00001),
-      gui.add(this.terrainSettings, 'noiseSeed'), //.min(0).max(10).step(1),
-      gui.add(this.terrainSettings, 'noiseDetail_1'), //.min(0).max(32).step(1),
-      gui.add(this.terrainSettings, 'noiseDetail_2'), //.min(0).max(3).step(1),
-      gui.add(this.terrainSettings, 'centerFalloff'), //.min(0).max(3).step(0.1),
-    ];
+    gui.add(this.terrainSettings, 'tileSize'); //.min(4).max(64).step(1);
+    gui.add(this.terrainSettings, 'scale'); //.min(0.00001).max(0.001).step(0.00001);
+    gui.add(this.terrainSettings, 'noiseSeed'); //.min(0).max(10).step(1);
+    gui.add(this.terrainSettings, 'noiseDetail_1'); //.min(0).max(32).step(1);
+    gui.add(this.terrainSettings, 'noiseDetail_2'); //.min(0).max(3).step(1);
+    gui.add(this.terrainSettings, 'centerFalloff'); //.min(0).max(3).step(0.1),
 
-    controllers.map((c) => c.onFinishChange(this.drawTerrain));
-    this.drawTerrain()
+
+    // redraw terrain when editing values
+    document.querySelector('.dg.main.a').addEventListener('mousedown', () => this.updatingTerrain = true);
+    document.querySelector('.dg.main.a').addEventListener('mouseup', () => this.updatingTerrain = false);
+    document.querySelector('.dg.main.a').addEventListener('mouseleave', () => this.updatingTerrain = false);
   }
 }
 
